@@ -1,0 +1,37 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "wikimap"
+version = "0.1.0"
+description = "A Python package to build and analyze Wikipedia article graphs from Wikimedia dumps."
+readme = "README.md"
+keywords = ["wikipedia", "graph", "wikimedia", "data-analysis"]
+license = {text = "MIT"}
+authors = [
+    {name = "Zakaria BELKHEIRI", email = "cs.of.origins@gmail.com"}
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "requests",
+    "tqdm",
+    "lxml",
+    "igraph",
+    "matplotlib",
+    "dash-cytoscape"
+]
+
+[tool.setuptools.packages.find]
+where = ["wikimap"]
+
+[tool.pylint]
+main = "wikimap"

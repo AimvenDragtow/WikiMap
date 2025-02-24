@@ -1,0 +1,7 @@
+setuptools
+requests
+tqdm
+lxml
+igraph
+matplotlib
+dash-cytoscape

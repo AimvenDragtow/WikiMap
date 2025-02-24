@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Data
+data/
+*.bz2
+*.pkl
+*.json
+
+# Environnements virtuels
+venv/
+.env/
+
+# Build
+dist/
+build/
+*.egg-info/
