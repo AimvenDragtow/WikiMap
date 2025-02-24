@@ -3,6 +3,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import networkx as nx
 from igraph import Graph, plot
+import time
 
 # Recombine all pages, current versions only
 # frwiki-20241101-pages-meta-current.xml.bz2
@@ -21,13 +22,48 @@ from igraph import Graph, plot
 # wm = WikiMap("fr/20241101/pages-meta-current.xml.bz2")
 # wm = WikiMap(date=datetime(2020, 5, 17), language="en", with_history=False)
 
-wm = WikiMap(date="latest", language=WikiLanguage.EN, with_history=False)
+wm = WikiMap(date="latest", language=WikiLanguage.EL)
 
 wm.load()
 
 wm.parse()
 
-# graph = wm.get_graph()
+wm.save_graph(WikiGraphFormat.CSV, "./tmp/el_save")
+
+graph = wm.get_graph()
+
+# Measure execution time for PageRank
+start_time = time.time()
+page_ranks = graph.pagerank()
+top_10_page_ranks = sorted([(graph.vs[i]["title"], page_ranks[i]) for i in range(len(page_ranks))], key=lambda x: x[1], reverse=True)[:10]
+print(f"Top 10 Page Ranks: {top_10_page_ranks}")
+print(f"PageRank execution time: {time.time() - start_time} seconds")
+
+# Measure execution time for out degrees and in degrees
+start_time = time.time()
+out_degrees = graph.outdegree()
+in_degrees = graph.indegree()
+top_10_out_degrees = sorted([(graph.vs[i]["title"], out_degrees[i]) for i in range(len(out_degrees))], key=lambda x: x[1], reverse=True)[:10]
+top_10_in_degrees = sorted([(graph.vs[i]["title"], in_degrees[i]) for i in range(len(in_degrees))], key=lambda x: x[1], reverse=True)[:10]
+print(f"Top 10 Out Degrees: {top_10_out_degrees}")
+print(f"Top 10 In Degrees: {top_10_in_degrees}")
+print(f"Out/In Degrees execution time: {time.time() - start_time} seconds")
+
+# Measure execution time for Louvain community detection on directed graph
+start_time = time.time()
+undirected_graph = graph.as_undirected()
+communities = undirected_graph.community_multilevel()
+print(f"Number of communities: {len(communities)}")
+print(f"Louvain community detection execution time: {time.time() - start_time} seconds")
+
+# # get graph diameter and on which nodes it is reached
+# start_time = time.time()
+# diameter = graph.diameter(directed=True)
+# print(f"Graph diameter: {diameter}")
+# futher_nodes = graph.farthest_points()
+# further_nodes_titles = [(graph.vs[node]["title"] for node in futher_nodes)]
+# print(f"Further nodes: {further_nodes_titles}")
+# print(f"Diameter execution time: {time.time() - start_time} seconds")
 
 # Pour NetworkX
 # print(f"Le graphe contient {graph.number_of_nodes()} nœuds et {graph.number_of_edges()} arêtes.")
@@ -55,9 +91,12 @@ wm.parse()
 # wm.save_graph(WikiGraphFormat.CSV, "./tmp/fr_test_save", compression=True)
 # wm.save_graph(WikiGraphFormat.CSV, "./tmp/fr_test_save")
 
-wm.display("United States", 1)
+# Measure execution time for displaying "United States"
+# start_time = time.time()
+# wm.display("United States", 1)
+# print(f"Display execution time: {time.time() - start_time} seconds")
 
-wm.sanity_check(WikiSanityCheckMode.NODES_SELECTION, 0.001)
+wm.sanity_check(WikiSanityCheckMode.NODES_SELECTION, 0.01)
 
 # wm.display_html("Άρης (πλανήτης)", 2, "wikimap_el_latest.html")
 # wm.display("Άρης (πλανήτης)", 2)
