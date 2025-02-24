@@ -6,13 +6,14 @@ import requests
 from igraph import Graph
 
 class WikiSanityChecker:
-    def __init__(self, graph: Graph, string_language, mode: WikiSanityCheckMode, n: float):
+    def __init__(self, graph: Graph, string_language, mode: WikiSanityCheckMode, n: float, titles_original_case: dict):
         if n <= 0 or n > 1:
             raise ValueError("n should be between 0 and 1")
         self.graph = graph
         self.string_language = string_language
         self.mode = mode
         self.n = n
+        self.titles_original_case = titles_original_case
         self.selectedNodes = set()
 
     def check(self):
@@ -39,13 +40,17 @@ class WikiSanityChecker:
         listApiMap = list(self.apiMap.values())
         # sort the two lists by ascending order of graphMap
         listGraphMap, listApiMap = zip(*sorted(zip(listGraphMap, listApiMap)))
-        plt.figure()
-        plt.plot(listApiMap, label="API")
-        plt.plot(listGraphMap, label="Graph")
-        plt.xlabel("Node")
+        plt.figure(figsize=(10, 6))
+        plt.plot(listApiMap, label="According to API", linestyle="-", color="r")
+        plt.plot(listGraphMap, label="According to WikiMap Graph", linestyle="--", color="b")
+        plt.xlabel("Articles")
         plt.ylabel("Links count")
+        plt.title("Data sanity check: Comparison of links count between WikiMap graph and Wikipedia API (outgoing degree)")
         plt.legend()
+        plt.grid()
+        plt.tight_layout()
         plt.savefig(path + ".png")
+        plt.close()
 
     def __selectNodes(self):
         if (self.mode.value == WikiSanityCheckMode.NODES_SELECTION.value or self.mode.value == WikiSanityCheckMode.NODES_EDGES_SELECTION.value):
@@ -96,7 +101,7 @@ class WikiSanityChecker:
                     "action": "query",
                     "format": "json",
                     "plnamespace": 0,
-                    "titles": node['title'],
+                    "titles": self.titles_original_case[node["title"]],
                     "prop": "links",
                     "pllimit": 500,
                     **continue_params

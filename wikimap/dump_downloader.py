@@ -108,6 +108,7 @@ class DumpDownloader:
 
     def extract(self, output_path: str):
         decompressed_path = output_path.replace(".bz2", "")
+        start_time = time.time()
         print(f"Extracting {output_path} to {decompressed_path}...")
         if not path.exists(output_path):
             print(f"File {output_path} does not exist.")
@@ -119,7 +120,7 @@ class DumpDownloader:
                 content = file.read()
                 with open(decompressed_path, 'wb') as decompressed_file:
                     decompressed_file.write(content)
-            print(f"Extraction completed: {decompressed_path}")
+            print(f"Extraction completed: {decompressed_path} in {time.time() - start_time:.2f} seconds")
         except OSError as e:
             print(f"Failed to extract {output_path}: {e}")
         except Exception as e:

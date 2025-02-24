@@ -63,6 +63,7 @@ class WikiMap:
         parser = DumpParser(path.join(self.directory, self.dump_name))
 
         # Get the original nodes and edges
+        self.titles_original_case = parser.get_titles_original_case()  # {low_case_title: original_title}
         self.aliases_counts = parser.get_aliases_counts()  # {original_title: count}
         reverse_nodes = parser.get_reverse_nodes()  # {original_id: title}
         edges = parser.get_edges()  # [(source_id, target_id)]
@@ -279,7 +280,7 @@ class WikiMap:
         # Check if the graph is directed
         if not self.graph.is_directed():
             raise Exception("The graph is not directed.")
-        sc = WikiSanityChecker(self.graph, self.string_language, mode, n)
+        sc = WikiSanityChecker(self.graph, self.string_language, mode, n, self.titles_original_case)
         sc.check()
         sc.save_analysis("sanity_check")
 
@@ -294,14 +295,13 @@ class WikiMap:
     def is_downloaded(self):
         # check if the dump is already downloaded
         # check if the file exists in the directory
-        file_path = path.join(self.directory, self.dump_name)
+        file_path = path.join(self.directory, self.dump_name + ".bz2")
         return path.exists(file_path) and path.getsize(file_path) > 0
 
     def is_extracted(self):
         # check if the dump is already extracted
         # check if the file exists in the directory
-        file_path = path.join(
-            self.directory, self.dump_name.replace(".bz2", ""))
+        file_path = path.join(self.directory, self.dump_name)
         return path.exists(file_path) and path.getsize(file_path) > 0
 
     def __get_subgraph(self, node_title: str, depth: int = 1, mode: str = "all") -> Graph:

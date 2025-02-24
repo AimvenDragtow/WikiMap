@@ -19,6 +19,7 @@ class DumpParser:
 
         self.raw_temp_data = {}  # Temporary storage for all pages
 
+        self.titles_original_case = {}  # Dictionary lowercase title -> original title
         self.aliases = {}  # Dictionary alias -> original title
         self.aliases_counts = {}  # Dictionary Original title -> count of aliases
         self.nodes = {}  # Dictionary node -> ID
@@ -42,6 +43,9 @@ class DumpParser:
     def get_articles_count(self):
         # Articles = Pages - Redirects (ns = 0)
         return self.pages_count - self.redirect_pages_count
+
+    def get_titles_original_case(self):
+        return self.titles_original_case
 
     def get_aliases_counts(self):
         return self.aliases_counts
@@ -118,16 +122,18 @@ class DumpParser:
 
         # convert id string to int
         id = int(id)
-        title = title.lower()
 
         self.pages_count += 1
 
         if redirect:
+            title = title.lower()
             redirect = redirect.lower()
             self.redirect_pages_count += 1
             self.aliases[title] = redirect
             self.aliases_counts[redirect] = self.aliases_counts.get(redirect, 0) + 1
         else:
+            self.titles_original_case[title.lower()] = title
+            title = title.lower()
             # Extract internal links
             # Find all links to other articles
             links = re.findall(self.link_pattern, text) if text else []
